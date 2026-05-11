@@ -6,32 +6,7 @@ An educational project that demonstrates the full **Model Context Protocol (MCP)
 
 ## How It Works
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  Browser / AEM Tool Page                                        │
-│  http://localhost:4502/content/hvozdzeu/tools/page-analyzer     │
-└───────────────┬─────────────────────────────────────────────────┘
-                │  POST /analyze  (JSON body: {url: "..."})
-                ▼
-┌───────────────────────────┐
-│  analyzer_api.py          │  HTTP server · port 5001
-│  (Python · ThreadingHTTP) │  Streams SSE events back to browser
-└──────┬────────────────────┘
-       │  stdio (subprocess)          │  HTTP /api/chat
-       ▼                              ▼
-┌─────────────┐              ┌────────────────────┐
-│  server.py  │              │  Ollama             │
-│  MCP Server │◄─ tool call ─│  model: qwen3.6     │
-│  (FastMCP)  │─ tool result─►│  port 11434        │
-└──────┬──────┘              └────────────────────┘
-       │  HTTP GET  *.infinity.json
-       ▼
-┌─────────────────────────────┐
-│  AEM 6.5                    │
-│  http://localhost:4502      │
-│  /content/hvozdzeu/...      │
-└─────────────────────────────┘
-```
+![e0386ef5-bb31-42d1-a051-fe3164895c70.jpg](sources/e0386ef5-bb31-42d1-a051-fe3164895c70.jpg)
 
 **Step-by-step flow:**
 
