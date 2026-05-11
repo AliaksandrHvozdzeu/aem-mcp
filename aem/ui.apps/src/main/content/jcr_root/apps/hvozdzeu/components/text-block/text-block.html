@@ -1,0 +1,21 @@
+<!--
+    Text Block — простой блок с заголовком и текстом.
+
+    Здесь не используем Sling Model — для простых компонентов
+    достаточно глобального объекта HTL `properties`:
+      properties.title    → читает свойство "title" из ValueMap текущего ресурса
+      properties.bodyText → читает свойство "bodyText"
+
+    @ context='html' — позволяет рендерить HTML-теги в значении (без этого — эскейпинг).
+    Используй только для доверенного контента от авторов.
+-->
+<sly data-sly-test="${properties.title || properties.bodyText}">
+    <section class="cmp-text-block">
+        <sly data-sly-test="${properties.title}">
+            <h2 class="cmp-text-block__title">${properties.title}</h2>
+        </sly>
+        <sly data-sly-test="${properties.bodyText}">
+            <div class="cmp-text-block__body">${properties.bodyText @ context='html'}</div>
+        </sly>
+    </section>
+</sly>

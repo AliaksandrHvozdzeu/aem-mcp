@@ -1,0 +1,22 @@
+<!--
+    Hero component.
+    data-sly-use.model — адаптирует текущий request к HeroModel.
+    data-sly-test      — условный рендеринг: показываем только если есть заголовок.
+-->
+<sly data-sly-use.model="com.hvozdzeu.core.models.HeroModel"
+     data-sly-test="${model.hasContent}">
+
+    <header class="cmp-hero">
+        <sly data-sly-test="${model.badgeText}">
+            <span class="cmp-hero__badge">${model.badgeText}</span>
+        </sly>
+        <h1 class="cmp-hero__title">${model.title}</h1>
+        <sly data-sly-test="${model.subtitle}">
+            <p class="cmp-hero__subtitle">${model.subtitle}</p>
+        </sly>
+        <sly data-sly-test="${model.description}">
+            <p class="cmp-hero__description">${model.description}</p>
+        </sly>
+    </header>
+
+</sly>

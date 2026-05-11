@@ -1,0 +1,24 @@
+<!--
+    Code Snippet — блок с кодом в стиле терминала.
+    JCR-свойства: label (строка языка/названия), code (текст кода).
+
+    @ context='text' — явно эскейпируем как текст (< → &lt; и т.д.),
+    что нужно внутри <pre><code>, чтобы HTML-теги не интерпретировались.
+    Это значение по умолчанию для <pre>, но указываем явно для ясности.
+-->
+<sly data-sly-test="${properties.code}">
+    <div class="cmp-code-snippet">
+
+        <div class="cmp-code-snippet__header">
+            <span class="cmp-code-snippet__dot cmp-code-snippet__dot--red"></span>
+            <span class="cmp-code-snippet__dot cmp-code-snippet__dot--yellow"></span>
+            <span class="cmp-code-snippet__dot cmp-code-snippet__dot--green"></span>
+            <sly data-sly-test="${properties.label}">
+                <span class="cmp-code-snippet__label">${properties.label}</span>
+            </sly>
+        </div>
+
+        <pre class="cmp-code-snippet__pre"><code>${properties.code @ context='text'}</code></pre>
+
+    </div>
+</sly>

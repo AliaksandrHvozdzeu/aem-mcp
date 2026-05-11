@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>hvozdzeu - UI Apps Package</comment>
+<entry key="allowIndexDefinitions">false</entry>
+<entry key="created">2026-05-11T09:56:28.092Z</entry>
+<entry key="groupId">com.hvozdzeu</entry>
+<entry key="name">hvozdzeu.ui.apps</entry>
+<entry key="description">AEM content package: /apps structure, components, OSGi configs</entry>
+<entry key="artifactId">hvozdzeu.ui.apps</entry>
+<entry key="version">1.0.0-SNAPSHOT</entry>
+<entry key="packageType">mixed</entry>
+<entry key="requiresRoot">false</entry>
+<entry key="group">com.hvozdzeu</entry>
+</properties>

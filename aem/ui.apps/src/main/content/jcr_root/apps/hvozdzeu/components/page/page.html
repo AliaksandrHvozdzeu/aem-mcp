@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<!--
+    page.html — корневой шаблон страницы (page component).
+
+    currentPage — глобальный объект HTL (com.day.cq.wcm.api.Page).
+                  Даёт доступ к title, path, properties страницы.
+
+    resource    — текущий ресурс (jcr:content страницы).
+    resource.listChildren() — возвращает Iterator дочерних ресурсов jcr:content.
+                              Каждый дочерний ресурс рендерится через data-sly-resource,
+                              который выбирает шаблон по sling:resourceType.
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>${currentPage.title} | hvozdzeu</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .page-wrapper { max-width: 900px; margin: 0 auto; padding: 0 24px 64px; }
+
+        /* ── hero ──────────────────────────────────────────── */
+        .cmp-hero {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f766e 100%);
+            color: #fff;
+            padding: 72px 40px;
+            border-radius: 0 0 24px 24px;
+            margin-bottom: 48px;
+            text-align: center;
+        }
+        .cmp-hero__badge {
+            display: inline-block;
+            background: rgba(255,255,255,.18);
+            border: 1px solid rgba(255,255,255,.3);
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: .78rem;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+        .cmp-hero__title   { font-size: 2.6rem; font-weight: 700; line-height: 1.2; margin-bottom: 12px; }
+        .cmp-hero__subtitle { font-size: 1.2rem; opacity: .85; margin-bottom: 20px; }
+        .cmp-hero__description { font-size: 1rem; opacity: .75; max-width: 600px; margin: 0 auto; }
+
+        /* ── text-block ─────────────────────────────────────── */
+        .cmp-text-block { margin-bottom: 40px; }
+        .cmp-text-block__title {
+            font-size: 1.5rem; font-weight: 600;
+            color: #0f172a; margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .cmp-text-block__body { font-size: 1rem; color: #475569; }
+
+        /* ── concept-card ───────────────────────────────────── */
+        .cmp-concept-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            box-shadow: 0 1px 4px rgba(0,0,0,.06);
+            transition: box-shadow .2s;
+        }
+        .cmp-concept-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+        .cmp-concept-card__icon { font-size: 2.2rem; flex-shrink: 0; }
+        .cmp-concept-card__content {}
+        .cmp-concept-card__title { font-size: 1.1rem; font-weight: 600; color: #0f172a; margin-bottom: 6px; }
+        .cmp-concept-card__description { font-size: .95rem; color: #64748b; }
+        .cmp-concept-card__tag {
+            display: inline-block;
+            background: #eff6ff;
+            color: #2563eb;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-size: .75rem;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+        /* ── key-points ─────────────────────────────────────── */
+        .cmp-key-points {
+            background: #fff;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 40px;
+            border: 1px solid #e2e8f0;
+        }
+        .cmp-key-points__title { font-size: 1.4rem; font-weight: 600; color: #0f172a; margin-bottom: 20px; }
+        .cmp-key-points__list  { padding-left: 0; list-style: none; }
+        .cmp-key-points__item  {
+            padding: 10px 0 10px 32px;
+            border-bottom: 1px solid #f1f5f9;
+            position: relative;
+            color: #334155;
+            font-size: .97rem;
+        }
+        .cmp-key-points__item:last-child { border-bottom: none; }
+        .cmp-key-points__item::before {
+            content: "✓";
+            position: absolute;
+            left: 6px;
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        /* ── code-snippet ───────────────────────────────────── */
+        .cmp-code-snippet { margin-bottom: 40px; }
+        .cmp-code-snippet__header {
+            display: flex;
+            align-items: center;
+            background: #1e293b;
+            border-radius: 10px 10px 0 0;
+            padding: 10px 16px;
+            gap: 8px;
+        }
+        .cmp-code-snippet__label {
+            color: #94a3b8;
+            font-size: .8rem;
+            font-family: monospace;
+        }
+        .cmp-code-snippet__dot { width: 10px; height: 10px; border-radius: 50%; }
+        .cmp-code-snippet__dot--red   { background: #ef4444; }
+        .cmp-code-snippet__dot--yellow{ background: #f59e0b; }
+        .cmp-code-snippet__dot--green { background: #10b981; }
+        .cmp-code-snippet__pre {
+            background: #0f172a;
+            border-radius: 0 0 10px 10px;
+            padding: 24px;
+            overflow-x: auto;
+            font-family: "Fira Code", "Cascadia Code", Consolas, monospace;
+            font-size: .87rem;
+            line-height: 1.7;
+            color: #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!--
+            data-sly-resource="nodeName" — явно рендерит дочерний ресурс по имени JCR-узла.
+            Sling ищет дочерний узел jcr:content/nodeName и рендерит его через sling:resourceType.
+            Это надёжнее, чем listChildren(), которая в HTL может вести себя непредсказуемо.
+
+            resourceType — резервный тип на случай, если у узла нет sling:resourceType.
+        -->
+        <sly data-sly-resource="hero"/>
+        <sly data-sly-resource="intro"/>
+        <sly data-sly-resource="card-tools"/>
+        <sly data-sly-resource="card-resources"/>
+        <sly data-sly-resource="card-prompts"/>
+        <sly data-sly-resource="principles"/>
+        <sly data-sly-resource="jsonrpc"/>
+    </div>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    .content.xml defines the JCR node for the component at /apps/hvozdzeu/components/helloworld.
+
+    jcr:primaryType="cq:Component" — required node type for AEM components.
+    jcr:title         — component name shown in the editor sidebar and Component Browser.
+    componentGroup    — group in the Component Browser. Use "." to hide
+                        the component from the browser (e.g. ".hidden").
+    jcr:description   — description shown on hover in the editor.
+    sling:resourceSuperType — inherit from another component (optional).
+-->
+<jcr:root
+    xmlns:jcr="http://www.jcp.org/jcr/1.0"
+    xmlns:cq="http://www.day.com/jcr/cq/1.0"
+    xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="cq:Component"
+    jcr:title="Hello World"
+    jcr:description="Simple Hello World component demonstrating Sling Models and Servlets."
+    componentGroup="hvozdzeu - Content"/>

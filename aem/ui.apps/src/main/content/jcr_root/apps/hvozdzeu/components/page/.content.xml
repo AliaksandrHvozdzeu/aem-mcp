@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Page component — renders the full HTML document for a page.
+    This is the root component: AEM invokes it for any page whose
+    sling:resourceType = "hvozdzeu/components/page".
+-->
+<jcr:root
+    xmlns:jcr="http://www.jcp.org/jcr/1.0"
+    xmlns:cq="http://www.day.com/jcr/cq/1.0"
+    jcr:primaryType="cq:Component"
+    jcr:title="Page"
+    jcr:description="Root page component"
+    componentGroup=".hidden"/>

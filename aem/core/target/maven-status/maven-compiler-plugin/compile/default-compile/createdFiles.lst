@@ -1,0 +1,4 @@
+com\hvozdzeu\core\models\HelloWorldModel.class
+com\hvozdzeu\core\models\HeroModel.class
+com\hvozdzeu\core\servlets\SimpleServlet.class
+com\hvozdzeu\core\models\KeyPointsModel.class

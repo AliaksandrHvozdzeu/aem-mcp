@@ -1,0 +1,1136 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Page Analyzer | AEM Tools</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --blue: #0265DC;
+            --blue-d: #0052b3;
+            --dark: #1b2a32;
+            --darker: #12202a;
+            --green: #2da44e;
+            --red: #e74c3c;
+            --amber: #d97706;
+            --g50: #f8fafc;
+            --g100: #f1f5f9;
+            --g200: #e2e8f0;
+            --g300: #cbd5e1;
+            --g400: #94a3b8;
+            --g600: #475569;
+            --g700: #334155;
+            --g900: #0f172a;
+            --radius: 10px;
+            --shadow: 0 1px 4px rgba(0, 0, 0, .08), 0 4px 16px rgba(0, 0, 0, .06);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--g100);
+            color: var(--g900);
+            min-height: 100vh;
+            font-size: 14px;
+        }
+
+        /* NAV */
+        .nav {
+            background: var(--darker);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 0 24px;
+            height: 52px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .4);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav__logo {
+            color: var(--red);
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -.5px
+        }
+
+        .nav__sep {
+            color: #444;
+            font-size: 1.1rem
+        }
+
+        .nav__title {
+            color: #cdd9e5;
+            font-size: .9rem;
+            font-weight: 500
+        }
+
+        .nav__badge {
+            margin-left: auto;
+            background: rgba(255, 255, 255, .07);
+            border: 1px solid rgba(255, 255, 255, .1);
+            color: var(--g400);
+            border-radius: 20px;
+            padding: 3px 12px;
+            font-size: .75rem;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #555;
+            flex-shrink: 0
+        }
+
+        .dot--on {
+            background: var(--green);
+            box-shadow: 0 0 6px var(--green)
+        }
+
+        /* LAYOUT */
+        .layout {
+            display: grid;
+            grid-template-columns:320px 1fr;
+            min-height: calc(100vh - 52px)
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            background: #fff;
+            border-right: 1px solid var(--g200);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            overflow-y: auto
+        }
+
+        .sidebar__title {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--g900);
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--g200)
+        }
+
+        label {
+            display: block;
+            font-size: .72rem;
+            font-weight: 700;
+            color: var(--g600);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: .05em
+        }
+
+        input[type=text] {
+            width: 100%;
+            padding: 9px 11px;
+            border: 1.5px solid var(--g200);
+            border-radius: 8px;
+            font-size: .88rem;
+            color: var(--g900);
+            outline: none;
+            transition: border-color .15s, box-shadow .15s
+        }
+
+        input[type=text]:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(2, 101, 220, .12)
+        }
+
+        .ql {
+            font-size: .7rem;
+            font-weight: 700;
+            color: var(--g400);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            margin-bottom: 7px
+        }
+
+        .qbtns {
+            display: flex;
+            flex-direction: column;
+            gap: 5px
+        }
+
+        .qbtn {
+            background: var(--g50);
+            border: 1.5px solid var(--g200);
+            border-radius: 7px;
+            padding: 8px 11px;
+            text-align: left;
+            cursor: pointer;
+            font-size: .82rem;
+            color: var(--g600);
+            transition: all .15s;
+            line-height: 1.4
+        }
+
+        .qbtn:hover {
+            background: #eff6ff;
+            border-color: var(--blue);
+            color: var(--blue)
+        }
+
+        .qbtn small {
+            display: block;
+            font-size: .7rem;
+            color: var(--g400);
+            margin-top: 2px;
+            font-weight: 400
+        }
+
+        .btn-go {
+            width: 100%;
+            padding: 12px;
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            font-size: .95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px
+        }
+
+        .btn-go:hover:not(:disabled) {
+            background: var(--blue-d)
+        }
+
+        .btn-go:disabled {
+            background: var(--g400);
+            cursor: not-allowed
+        }
+
+        .btn-clr {
+            width: 100%;
+            padding: 8px;
+            background: none;
+            color: var(--g400);
+            border: 1.5px solid var(--g200);
+            border-radius: 7px;
+            font-size: .82rem;
+            cursor: pointer;
+            transition: all .15s
+        }
+
+        .btn-clr:hover {
+            border-color: var(--red);
+            color: var(--red)
+        }
+
+        /* MAIN */
+        .main {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto
+        }
+
+        .empty {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--g400);
+            text-align: center;
+            padding: 40px
+        }
+
+        .empty svg {
+            opacity: .25
+        }
+
+        .empty p {
+            font-size: .9rem;
+            line-height: 1.6
+        }
+
+        /* FLOW DIAGRAM */
+        .flow-wrap {
+            background: #fff;
+            border: 1px solid var(--g200);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            box-shadow: var(--shadow)
+        }
+
+        .flow-title {
+            font-size: .72rem;
+            font-weight: 700;
+            color: var(--g400);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            margin-bottom: 14px
+        }
+
+        .flow {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            overflow-x: auto;
+            padding-bottom: 4px
+        }
+
+        .fnode {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            min-width: 80px
+        }
+
+        .fnode__box {
+            width: 64px;
+            height: 52px;
+            border-radius: 9px;
+            border: 2px solid var(--g200);
+            background: var(--g50);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            transition: all .3s;
+            cursor: default
+        }
+
+        .fnode__icon {
+            font-size: 1.3rem;
+            line-height: 1
+        }
+
+        .fnode__name {
+            font-size: .6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: var(--g400);
+            text-align: center;
+            white-space: nowrap
+        }
+
+        .fnode__lbl {
+            font-size: .68rem;
+            color: var(--g400);
+            text-align: center;
+            white-space: nowrap;
+            line-height: 1.3
+        }
+
+        /* states */
+        .fnode--done .fnode__box {
+            border-color: var(--green);
+            background: #f0fdf4
+        }
+
+        .fnode--done .fnode__name {
+            color: var(--green)
+        }
+
+        .fnode--active .fnode__box {
+            border-color: var(--blue);
+            background: #eff6ff;
+            box-shadow: 0 0 0 3px rgba(2, 101, 220, .15);
+            animation: pulse .9s ease-in-out infinite alternate
+        }
+
+        .fnode--active .fnode__name {
+            color: var(--blue)
+        }
+
+        @keyframes pulse {
+            from {
+                box-shadow: 0 0 0 2px rgba(2, 101, 220, .15)
+            }
+            to {
+                box-shadow: 0 0 0 6px rgba(2, 101, 220, .25)
+            }
+        }
+
+        .farrow {
+            flex: 1;
+            min-width: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--g300);
+            font-size: 1.1rem;
+            padding-bottom: 18px
+        }
+
+        /* PROGRESS */
+        .prog-card {
+            background: #fff;
+            border: 1px solid var(--g200);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow)
+        }
+
+        .prog-head {
+            background: var(--dark);
+            color: #fff;
+            padding: 11px 16px;
+            font-size: .82rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .prog-head--done {
+            background: #166534
+        }
+
+        .prog-head--err {
+            background: #991b1b
+        }
+
+        .prog-body {
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 9px 13px;
+            border-radius: 8px;
+            font-size: .84rem;
+            animation: fadeUp .25s ease;
+            line-height: 1.5
+        }
+
+        .step--progress {
+            background: #eff6ff;
+            color: #1d4ed8
+        }
+
+        .step--tools {
+            background: #f0fdf4;
+            color: #166534
+        }
+
+        .step--call {
+            background: #fefce8;
+            color: #854d0e
+        }
+
+        .step--result {
+            background: #f0fdf4;
+            color: #166534
+        }
+
+        .step--error {
+            background: #fef2f2;
+            color: #991b1b
+        }
+
+        .step__icon {
+            font-size: .95rem;
+            flex-shrink: 0;
+            margin-top: 1px
+        }
+
+        .step__text {
+            flex: 1
+        }
+
+        .step__text code {
+            background: rgba(0, 0, 0, .06);
+            border-radius: 4px;
+            padding: 1px 5px;
+            font-size: .8rem;
+            font-family: monospace
+        }
+
+        .step__meta {
+            font-size: .72rem;
+            opacity: .65;
+            margin-top: 3px
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(5px)
+            }
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        /* SPINNER */
+        .spinner {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+            border: 2px solid rgba(255, 255, 255, .25);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .7s linear infinite
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        /* RESULT CARD */
+        .res-card {
+            background: #fff;
+            border: 1px solid var(--g200);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow)
+        }
+
+        .res-head {
+            background: var(--green);
+            color: #fff;
+            padding: 11px 16px;
+            font-size: .82rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .res-body {
+            padding: 24px 28px;
+            line-height: 1.7
+        }
+
+        /* MARKDOWN */
+        .md h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--g900);
+            margin: 0 0 12px
+        }
+
+        .md h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--g900);
+            margin: 22px 0 10px;
+            padding-bottom: 7px;
+            border-bottom: 2px solid var(--g200)
+        }
+
+        .md h3 {
+            font-size: .97rem;
+            font-weight: 700;
+            color: var(--blue);
+            margin: 18px 0 8px
+        }
+
+        .md p {
+            color: var(--g700);
+            margin-bottom: 10px
+        }
+
+        .md ul, .md ol {
+            padding-left: 22px;
+            color: var(--g700);
+            margin-bottom: 10px
+        }
+
+        .md li {
+            margin-bottom: 4px
+        }
+
+        .md code {
+            background: var(--g100);
+            border: 1px solid var(--g200);
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-size: .82rem;
+            font-family: "Fira Code", monospace
+        }
+
+        .md pre {
+            background: var(--g900);
+            color: #e2e8f0;
+            border-radius: 9px;
+            padding: 16px;
+            overflow-x: auto;
+            font-size: .82rem;
+            line-height: 1.65;
+            margin-bottom: 12px
+        }
+
+        .md pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            color: inherit
+        }
+
+        .md hr {
+            border: none;
+            border-top: 1px solid var(--g200);
+            margin: 18px 0
+        }
+
+        .md strong {
+            font-weight: 700;
+            color: var(--g900)
+        }
+
+        .md em {
+            font-style: italic
+        }
+
+        .md blockquote {
+            border-left: 3px solid var(--blue);
+            padding: 8px 14px;
+            background: #eff6ff;
+            border-radius: 0 7px 7px 0;
+            margin-bottom: 10px;
+            color: var(--g700)
+        }
+
+        /* Tables */
+        .md-table-wrap {
+            overflow-x: auto;
+            margin-bottom: 14px;
+            border-radius: 9px;
+            border: 1px solid var(--g200)
+        }
+
+        .md table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .84rem
+        }
+
+        .md th {
+            background: var(--g100);
+            padding: 9px 14px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--g700);
+            border-bottom: 2px solid var(--g200);
+            white-space: nowrap
+        }
+
+        .md td {
+            padding: 9px 14px;
+            border-bottom: 1px solid var(--g200);
+            color: var(--g600)
+        }
+
+        .md tr:last-child td {
+            border-bottom: none
+        }
+
+        .md tr:hover td {
+            background: var(--g50)
+        }
+
+        .btn-copy {
+            background: rgba(255, 255, 255, .18);
+            border: 1px solid rgba(255, 255, 255, .3);
+            color: #fff;
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-size: .75rem;
+            cursor: pointer;
+            transition: background .15s
+        }
+
+        .btn-copy:hover {
+            background: rgba(255, 255, 255, .32)
+        }
+    </style>
+</head>
+<body>
+
+<nav class="nav">
+    <span class="nav__logo">AEM</span>
+    <span class="nav__sep">&#x203A;</span>
+    <span class="nav__title">Tools / Page Analyzer</span>
+    <span class="nav__badge" id="apiBadge">
+    <span class="dot" id="apiDot"></span>
+    <span id="apiLbl">Checking API...</span>
+  </span>
+</nav>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar__title">&#x1F50D; Analyze Page</div>
+
+        <div>
+            <label>Page URL (JSON endpoint)</label>
+            <input type="text" id="pageUrl"
+                   placeholder="/content/site/page.infinity.json"
+                   value="/content/hvozdzeu/en/mcp-principles.infinity.json"/>
+        </div>
+
+        <div>
+            <p class="ql">Quick select</p>
+            <div class="qbtns" id="qbtns">
+                <button class="qbtn" data-path="/content/hvozdzeu/en/mcp-principles.infinity.json">
+                    MCP Principles
+                    <small>/content/hvozdzeu/en/mcp-principles</small>
+                </button>
+            </div>
+        </div>
+
+        <button class="btn-go" id="btnGo" onclick="startAnalysis()">
+            <span id="btnTxt">Analyze Page</span>
+        </button>
+        <button class="btn-clr" onclick="clearAll()">Clear results</button>
+    </aside>
+
+    <main class="main" id="mainArea">
+        <div class="empty" id="emptyState">
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <p>Enter an AEM page URL and click <strong>Analyze Page</strong>.<br/>
+                The AI will inspect components and content in real-time.</p>
+            <p style="font-size:.75rem;margin-top:4px">Powered by MCP + Ollama (qwen3.6)</p>
+        </div>
+    </main>
+</div>
+
+<script>
+  var API = 'http://localhost:5001';
+  var AEM = 'http://localhost:4502';
+
+  // ── Icons (HTML entities only) ──────────────────────────────────────────────
+  var I = {
+    globe: '&#x1F310;',
+    api: '&#x26A1;',
+    mcp: '&#x1F527;',
+    aem: '&#x1F4C4;',
+    ai: '&#x1F916;',
+    report: '&#x1F4CA;',
+    clock: '&#x23F3;',
+    wrench: '&#x1F527;',
+    out: '&#x1F4E4;',
+    inp: '&#x1F4E5;',
+    ok: '&#x2705;',
+    err: '&#x274C;',
+    arrow: '&#x2192;'
+  };
+
+  // ── Flow diagram nodes ───────────────────────────────────────────────────────
+  var FLOW_NODES = [
+    {id: 'f-browser', icon: I.globe, name: 'Browser', lbl: 'You'},
+    {id: 'f-api', icon: I.api, name: 'API', lbl: ':5001'},
+    {id: 'f-mcp', icon: I.mcp, name: 'MCP Server', lbl: 'server.py'},
+    {id: 'f-aem', icon: I.aem, name: 'AEM', lbl: ':4502'},
+    {id: 'f-ai', icon: I.ai, name: 'Ollama', lbl: 'qwen3.6'},
+    {id: 'f-report', icon: I.report, name: 'Report', lbl: 'Output'}
+  ];
+
+  function buildFlow() {
+    var html = '<div class="flow-wrap"><div class="flow-title">Request pipeline</div><div class="flow" id="flowRow">';
+    for (var i = 0; i < FLOW_NODES.length; i++) {
+      var n = FLOW_NODES[i];
+      html += '<div class="fnode" id="' + n.id + '">' +
+        '<div class="fnode__box"><div class="fnode__icon">' + n.icon + '</div>' +
+        '<div class="fnode__name">' + n.name + '</div></div>' +
+        '<div class="fnode__lbl">' + n.lbl + '</div></div>';
+      if (i < FLOW_NODES.length - 1) {
+        html += '<div class="farrow">' + I.arrow + '</div>';
+      }
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  function flowSet(nodeId, state) {  // state: 'active' | 'done' | ''
+    var el = document.getElementById(nodeId);
+    if (!el) return;
+    el.className = 'fnode' + (state ? ' fnode--' + state : '');
+  }
+
+  function flowAdvance(active, done) {
+    // done = array of node ids to mark done, active = id to highlight
+    if (done) {
+      for (var i = 0; i < done.length; i++) flowSet(done[i], 'done');
+    }
+    if (active) flowSet(active, 'active');
+  }
+
+  // ── API health check ─────────────────────────────────────────────────────────
+  async function checkApi() {
+    try {
+      var r = await fetch(API + '/', {signal: AbortSignal.timeout(3000)});
+      if (r.ok) {
+        document.getElementById('apiDot').classList.add('dot--on');
+        document.getElementById('apiLbl').textContent = 'API ready';
+      }
+    } catch (e) {
+      document.getElementById('apiLbl').textContent = 'API offline';
+    }
+  }
+
+  checkApi();
+
+  // Quick select
+  document.querySelectorAll('.qbtn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.getElementById('pageUrl').value = b.dataset.path;
+    });
+  });
+
+  // ── State helpers ─────────────────────────────────────────────────────────────
+  function setBusy() {
+    document.getElementById('btnGo').disabled = true;
+    document.getElementById('btnTxt').textContent = 'Analyzing...';
+  }
+
+  function setReady() {
+    document.getElementById('btnGo').disabled = false;
+    document.getElementById('btnTxt').textContent = 'Analyze Page';
+  }
+
+  function clearAll() {
+    document.getElementById('mainArea').innerHTML =
+      '<div class="empty" id="emptyState">' +
+      '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">' +
+      '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>' +
+      '<p>Enter an AEM page URL and click <strong>Analyze Page</strong>.</p></div>';
+    setReady();
+  }
+
+  // ── Markdown renderer ────────────────────────────────────────────────────────
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function inline(s) {
+    return esc(s)
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>');
+  }
+
+  function renderMarkdown(md) {
+    var lines = md.split('\n');
+    var out = [];
+    var i = 0;
+    while (i < lines.length) {
+      var raw = lines[i];
+      var t = raw.trim();
+      if (!t) {
+        i++;
+        continue;
+      }
+
+      // Code fence
+      if (t.startsWith('```')) {
+        var code = [];
+        i++;
+        while (i < lines.length && !lines[i].trim().startsWith('```')) {
+          code.push(esc(lines[i]));
+          i++;
+        }
+        i++;
+        out.push('<pre><code>' + code.join('\n') + '</code></pre>');
+        continue;
+      }
+      // HR
+      if (t.match(/^[-*_]{3,}$/)) {
+        out.push('<hr/>');
+        i++;
+        continue;
+      }
+      // Headings
+      if (t.startsWith('### ')) {
+        out.push('<h3>' + inline(t.slice(4)) + '</h3>');
+        i++;
+        continue;
+      }
+      if (t.startsWith('## ')) {
+        out.push('<h2>' + inline(t.slice(3)) + '</h2>');
+        i++;
+        continue;
+      }
+      if (t.startsWith('# ')) {
+        out.push('<h1>' + inline(t.slice(2)) + '</h1>');
+        i++;
+        continue;
+      }
+      // Blockquote
+      if (t.startsWith('> ')) {
+        var bqLines = [];
+        while (i < lines.length && lines[i].trim().startsWith('> ')) {
+          bqLines.push(inline(lines[i].trim().slice(2)));
+          i++;
+        }
+        out.push('<blockquote>' + bqLines.join('<br/>') + '</blockquote>');
+        continue;
+      }
+      // Table: current line starts with | and next line is separator
+      if (t.startsWith('|') && i + 1 < lines.length && lines[i + 1].trim().match(/^\|[\s\-:|]+\|/)) {
+        var hdr = t.slice(1, t.endsWith('|') ? -1 : undefined).split('|');
+        var thead = '<tr>' + hdr.map(function (c) {
+          return '<th>' + inline(c.trim()) + '</th>';
+        }).join('') + '</tr>';
+        i += 2; // skip header row + separator row
+        var rows = [];
+        while (i < lines.length && lines[i].trim().startsWith('|')) {
+          var cells = lines[i].trim().slice(1, lines[i].trim().endsWith('|') ? -1 : undefined).split('|');
+          rows.push('<tr>' + cells.map(function (c) {
+            return '<td>' + inline(c.trim()) + '</td>';
+          }).join('') + '</tr>');
+          i++;
+        }
+        out.push('<div class="md-table-wrap"><table><thead>' + thead + '</thead><tbody>' + rows.join('') + '</tbody></table></div>');
+        continue;
+      }
+      // Unordered list
+      if (t.match(/^[-*+] /)) {
+        var items = [];
+        while (i < lines.length && lines[i].trim().match(/^[-*+] /)) {
+          items.push('<li>' + inline(lines[i].trim().replace(/^[-*+] /, '')) + '</li>');
+          i++;
+        }
+        out.push('<ul>' + items.join('') + '</ul>');
+        continue;
+      }
+      // Ordered list
+      if (t.match(/^\d+[.)]\s/)) {
+        var oitems = [];
+        while (i < lines.length && lines[i].trim().match(/^\d+[.)]\s/)) {
+          oitems.push('<li>' + inline(lines[i].trim().replace(/^\d+[.)]\s/, '')) + '</li>');
+          i++;
+        }
+        out.push('<ol>' + oitems.join('') + '</ol>');
+        continue;
+      }
+      // Paragraph
+      var para = [];
+      while (i < lines.length) {
+        var rt = lines[i].trim();
+        if (!rt || rt.startsWith('#') || rt.startsWith('|') || rt.startsWith('```') ||
+          rt.match(/^[-*+] /) || rt.match(/^\d+[.)]\s/) || rt.startsWith('> ') ||
+          rt.match(/^[-*_]{3,}$/)) break;
+        para.push(inline(rt));
+        i++;
+      }
+      if (para.length) out.push('<p>' + para.join(' ') + '</p>');
+    }
+    return out.join('\n');
+  }
+
+  // ── Main analysis ─────────────────────────────────────────────────────────────
+  async function startAnalysis() {
+    var raw = document.getElementById('pageUrl').value.trim();
+    if (!raw) {
+      alert('Please enter a page URL.');
+      return;
+    }
+    var pageUrl = raw.startsWith('http') ? raw : AEM + raw;
+
+    setBusy();
+
+    var main = document.getElementById('mainArea');
+    // Build initial layout: flow diagram + progress card
+    main.innerHTML =
+      buildFlow() +
+      '<div class="prog-card" id="progCard">' +
+      '<div class="prog-head" id="progHead"><div class="spinner"></div>' +
+      '<span>Running analysis&hellip;</span>' +
+      '<span style="margin-left:auto;font-size:.75rem;opacity:.6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px">' + esc(pageUrl) + '</span>' +
+      '</div>' +
+      '<div class="prog-body" id="progBody"></div>' +
+      '</div>';
+
+    // Mark Browser as done immediately
+    flowAdvance('f-api', ['f-browser']);
+
+    var progBody = document.getElementById('progBody');
+
+    function addStep(cls, iconHtml, html) {
+      var el = document.createElement('div');
+      el.className = 'step step--' + cls;
+      el.innerHTML = '<span class="step__icon">' + iconHtml + '</span>' +
+        '<div class="step__text">' + html + '</div>';
+      progBody.appendChild(el);
+      el.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    }
+
+    // Map progress messages to flow nodes
+    function handleProgress(msg) {
+      addStep('progress', I.clock, esc(msg));
+      var m = msg.toLowerCase();
+      if (m.indexOf('starting mcp') >= 0) flowAdvance('f-mcp', ['f-api']);
+      else if (m.indexOf('mcp server ready') >= 0) flowAdvance('f-mcp', ['f-api']);
+      else if (m.indexOf('asking') >= 0) flowAdvance('f-ai', ['f-mcp']);
+      else if (m.indexOf('generating') >= 0) flowAdvance('f-ai', []);
+    }
+
+    try {
+      var resp = await fetch(API + '/analyze', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url: pageUrl})
+      });
+      if (!resp.ok) {
+        var e = await resp.json().catch(function () {
+          return {error: resp.statusText};
+        });
+        addStep('error', I.err, esc(e.error || 'Request failed'));
+        setReady();
+        return;
+      }
+
+      var reader = resp.body.getReader();
+      var decoder = new TextDecoder();
+      var buf = '';
+
+      while (true) {
+        var chunk = await reader.read();
+        if (chunk.done) break;
+        buf += decoder.decode(chunk.value, {stream: true});
+        var lines = buf.split('\n');
+        buf = lines.pop();
+
+        for (var li = 0; li < lines.length; li++) {
+          var line = lines[li];
+          if (!line.startsWith('data: ')) continue;
+          var ev;
+          try {
+            ev = JSON.parse(line.slice(6));
+          } catch (ex) {
+            continue;
+          }
+
+          switch (ev.type) {
+            case 'progress':
+              handleProgress(ev.message);
+              break;
+
+            case 'tools_loaded':
+              flowAdvance(null, ['f-mcp']);
+              addStep('tools', I.wrench,
+                'MCP tools ready: ' + ev.tools.map(function (t) {
+                  return '<code>' + esc(t) + '</code>';
+                }).join(' &middot; '));
+              break;
+
+            case 'tool_call':
+              flowAdvance('f-aem', []);
+              addStep('call', I.out,
+                'Calling <code>' + esc(ev.name) + '</code>' +
+                ' &rarr; <code>' + esc(JSON.stringify(ev.args)) + '</code>');
+              break;
+
+            case 'tool_result':
+              flowAdvance(null, ['f-aem']);
+              addStep('result', I.inp,
+                '<code>' + esc(ev.name) + '</code> &mdash; ' + ev.chars + ' chars received' +
+                '<div class="step__meta">' + esc(ev.preview) + '</div>');
+              break;
+
+            case 'error':
+              flowSet('f-ai', '');
+              var ph = document.getElementById('progHead');
+              ph.className = 'prog-head prog-head--err';
+              ph.innerHTML = '<span>' + I.err + ' Analysis failed</span>';
+              addStep('error', I.err, esc(ev.message));
+              setReady();
+              break;
+
+            case 'final':
+              // Mark all flow nodes done
+              flowAdvance('f-report', ['f-browser', 'f-api', 'f-mcp', 'f-aem', 'f-ai']);
+              setTimeout(function () {
+                flowSet('f-report', 'done');
+              }, 400);
+
+              var ph2 = document.getElementById('progHead');
+              ph2.className = 'prog-head prog-head--done';
+              ph2.innerHTML = '<span>' + I.ok + ' Analysis complete</span>';
+
+              var card = document.createElement('div');
+              card.className = 'res-card';
+              card.innerHTML =
+                '<div class="res-head">' +
+                '<span>' + I.ai + ' AI Analysis Report</span>' +
+                '<button class="btn-copy" onclick="copyResult()">Copy</button>' +
+                '</div>' +
+                '<div class="res-body md" id="resBody">' +
+                renderMarkdown(ev.answer) +
+                '</div>';
+              main.appendChild(card);
+              card.scrollIntoView({behavior: 'smooth'});
+              window._lastAnswer = ev.answer;
+              setReady();
+              break;
+
+            case 'done':
+              setReady();
+              break;
+          }
+        }
+      }
+    } catch (err) {
+      if (document.getElementById('progBody')) {
+        document.getElementById('progBody').appendChild((function () {
+          var el = document.createElement('div');
+          el.className = 'step step--error';
+          el.innerHTML = '<span class="step__icon">' + I.err + '</span>' +
+            '<div class="step__text">' +
+            (err.message.indexOf('fetch') >= 0 || err.message.indexOf('Failed') >= 0
+              ? 'Cannot reach API at ' + API + '. Is <code>analyzer_api.py</code> running?'
+              : esc(err.message)) +
+            '</div>';
+          return el;
+        })());
+      }
+      setReady();
+    }
+  }
+
+  function copyResult() {
+    if (window._lastAnswer) {
+      navigator.clipboard.writeText(window._lastAnswer).then(function () {
+        var b = document.querySelector('.btn-copy');
+        b.textContent = 'Copied!';
+        setTimeout(function () {
+          b.textContent = 'Copy';
+        }, 2000);
+      });
+    }
+  }
+
+  document.getElementById('pageUrl').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') startAnalysis();
+  });
+</script>
+</body>
+</html>

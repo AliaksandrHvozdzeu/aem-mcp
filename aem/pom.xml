@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- =========================================================
+         PROJECT IDENTITY
+         ========================================================= -->
+    <groupId>com.hvozdzeu</groupId>
+    <artifactId>hvozdzeu</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>hvozdzeu - AEM 6.5 Project</name>
+    <description>Minimal AEM 6.5 project: servlets and Sling Models</description>
+
+    <!-- =========================================================
+         CHILD MODULES
+         - core     : Java OSGi bundle (Servlets, Sling Models)
+         - ui.apps  : AEM content package (/apps, OSGi configs)
+         ========================================================= -->
+    <modules>
+        <module>core</module>
+        <module>ui.apps</module>
+    </modules>
+
+    <!-- =========================================================
+         COMMON PROPERTIES
+         ========================================================= -->
+    <properties>
+        <!-- Java 17 (AEM 6.5 SP13+ supports Java 17).
+             If using base 6.5.0, downgrading to Java 11 is recommended. -->
+        <java.version>17</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- AEM uber-jar version.
+             For Service Packs use: 6.5.7, 6.5.14, 6.5.21, etc.
+             Downloaded from repo.adobe.com — internet access required. -->
+        <aem.version>6.5.0</aem.version>
+
+        <!-- Application name — used in the /apps/{app.name} path -->
+        <app.name>hvozdzeu</app.name>
+
+        <!-- Plugin versions -->
+        <filevault.version>1.3.2</filevault.version>
+        <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
+        <maven.surefire.plugin.version>3.1.2</maven.surefire.plugin.version>
+    </properties>
+
+    <!-- =========================================================
+         ADOBE MAVEN REPOSITORIES
+         The uber-jar and other Adobe artifacts are downloaded from here.
+         ========================================================= -->
+    <repositories>
+        <repository>
+            <id>adobe-public-releases</id>
+            <name>Adobe Public Repository</name>
+            <url>https://repo.adobe.com/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>adobe-public-releases</id>
+            <name>Adobe Public Repository</name>
+            <url>https://repo.adobe.com/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <!-- =========================================================
+         DEPENDENCY MANAGEMENT
+         Versions are declared here once; child modules only specify
+         groupId + artifactId.
+         ========================================================= -->
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- AEM 6.5 uber-jar: contains all AEM/CQ/Sling/Jackrabbit APIs.
+                 Scope provided — jar is in the AEM runtime, not embedded in the bundle. -->
+            <dependency>
+                <groupId>com.adobe.aem</groupId>
+                <artifactId>uber-jar</artifactId>
+                <version>${aem.version}</version>
+                <classifier>apis</classifier>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Sling Models API — for @Model, @ValueMapValue, and related annotations -->
+            <dependency>
+                <groupId>org.apache.sling</groupId>
+                <artifactId>org.apache.sling.models.api</artifactId>
+                <version>1.4.0</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- OSGi Declarative Services — @Component, @Reference, @Activate -->
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.service.component.annotations</artifactId>
+                <version>1.4.0</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- OSGi Metatype — @Designate, @ObjectClassDefinition for configs -->
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.service.metatype.annotations</artifactId>
+                <version>1.4.0</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- OSGi Core — Constants, BundleContext, etc. -->
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>osgi.core</artifactId>
+                <version>8.0.0</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Servlet API 3.1 (included in uber-jar, declared explicitly for IDE support) -->
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>3.1.0</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- SLF4J — logging. AEM uses Logback under the hood. -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.36</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- JUnit 5 for unit tests (scope test) -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>5.10.0</version>
+                <scope>test</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- =========================================================
+         PLUGIN MANAGEMENT
+         ========================================================= -->
+    <build>
+        <pluginManagement>
+            <plugins>
+
+                <!-- Maven Compiler Plugin — compiles Java sources -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin.version}</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                    </configuration>
+                </plugin>
+
+                <!-- FileVault Package Maven Plugin — builds the AEM content package.
+                     Packages the contents of jcr_root/ into a zip file
+                     that can be installed in AEM via Package Manager or Maven. -->
+                <plugin>
+                    <groupId>org.apache.jackrabbit</groupId>
+                    <artifactId>filevault-package-maven-plugin</artifactId>
+                    <version>${filevault.version}</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <packageType>application</packageType>
+                        <filterSource>src/main/content/META-INF/vault/filter.xml</filterSource>
+                    </configuration>
+                </plugin>
+
+                <!-- Maven Surefire — runs unit tests -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven.surefire.plugin.version}</version>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>

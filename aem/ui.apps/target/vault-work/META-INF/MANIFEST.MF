@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Created-By: Apache Jackrabbit FileVault - Package Maven Plugin 1.3.2
+Build-Jdk-Spec: 17
+Implementation-Title: hvozdzeu - UI Apps Package
+Implementation-Version: 1.0.0-SNAPSHOT
+Content-Package-Type: mixed
+Content-Package-Id: com.hvozdzeu:hvozdzeu.ui.apps:1.0.0-SNAPSHOT
+Content-Package-Description: AEM content package: /apps structure, compo
+ nents, OSGi configs
+Content-Package-Roots: /apps/hvozdzeu,/content/hvozdzeu
+

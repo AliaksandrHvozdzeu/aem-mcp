@@ -1,0 +1,40 @@
+<!--
+    HTL (HTML Template Language) — серверный шаблонизатор AEM.
+    Заменил JSP начиная с AEM 6.1. Безопасен по умолчанию (XSS-защита).
+
+    data-sly-use.model — создаёт экземпляр Sling Model и привязывает его к переменной "model".
+    Sling адаптирует текущий SlingHttpServletRequest к HelloWorldModel.
+
+    ${model.greeting}  — вызывает HelloWorldModel.getGreeting(). Вывод автоматически
+                         экранируется (защита от XSS). Для HTML без эскейпинга: ${model.greeting @ context='html'}
+-->
+<sly data-sly-use.model="com.hvozdzeu.core.models.HelloWorldModel">
+
+    <div class="helloworld cmp-helloworld">
+
+        <!--
+            data-sly-test — условный рендеринг (аналог if).
+            Блок отображается только если model.greeting не null и не пустая строка.
+        -->
+        <sly data-sly-test="${model.greeting}">
+            <h2 class="cmp-helloworld__greeting">${model.greeting}</h2>
+        </sly>
+
+        <!--
+            data-sly-test.empty — инвертированное условие (если greeting пустой).
+            Переменная "empty" будет true, если greeting пустой.
+        -->
+        <sly data-sly-test="${!model.greeting}">
+            <p class="cmp-helloworld__empty">No message configured. Please edit the component.</p>
+        </sly>
+
+        <!--
+            data-sly-test — показываем заголовок только если он задан
+        -->
+        <sly data-sly-test="${model.title}">
+            <p class="cmp-helloworld__title">Title: ${model.title}</p>
+        </sly>
+
+    </div>
+
+</sly>

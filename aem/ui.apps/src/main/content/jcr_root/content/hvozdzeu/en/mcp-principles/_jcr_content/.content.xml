@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Demo page: "MCP Principles"
+    URL: /content/hvozdzeu/en/mcp-principles.html
+
+    NOTE — multi-value String[] in FileVault XML:
+      items="[value1,value2]"          — two elements
+      items="[val with\, comma,val2]"  — a comma INSIDE a value must be escaped as \,
+-->
+<jcr:root
+    xmlns:jcr="http://www.jcp.org/jcr/1.0"
+    xmlns:cq="http://www.day.com/jcr/cq/1.0"
+    xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+    jcr:primaryType="cq:PageContent"
+    jcr:title="MCP Principles"
+    sling:resourceType="hvozdzeu/components/page"
+    cq:template="/apps/hvozdzeu/templates/page">
+
+    <!-- 1. HERO -->
+    <hero
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="hvozdzeu/components/hero"
+        badgeText="MCP · 2026"
+        title="Model Context Protocol"
+        subtitle="The universal connector between AI models and the world"
+        description="MCP is an open protocol that standardizes how applications provide context to LLMs. Think of it as a USB-C port for AI — one universal interface that works with any model and any tool."/>
+
+    <!-- 2. TEXT BLOCK -->
+    <intro
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="hvozdzeu/components/text-block"
+        title="What is MCP?"
+        bodyText="&lt;p&gt;Before MCP every AI integration was a custom one-off: different APIs\, different auth schemes\, different data formats. Developers had to rebuild the same connectors over and over again.&lt;/p&gt;&lt;p&gt;MCP solves this with a &lt;strong&gt;single standard protocol&lt;/strong&gt; for bidirectional communication between AI models (clients) and the systems they interact with (servers). Built on JSON-RPC 2.0\, it works over stdio\, HTTP/SSE\, or WebSockets.&lt;/p&gt;"/>
+
+    <!-- 3. CONCEPT CARD: Tools -->
+    <card-tools
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="hvozdzeu/components/concept-card"
+        icon="&#x1F527;"
+        title="Tools"
+        tag="Model-controlled"
+        description="Functions that an AI model can invoke to perform actions or retrieve data. The model decides when to call a tool based on its description. Examples: execute_sql()\, search_web()\, send_email(). Tools are the hands of an AI agent."/>
+
+    <!-- 4. CONCEPT CARD: Resources -->
+    <card-resources
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="hvozdzeu/components/concept-card"
+        icon="&#x1F4C2;"
+        title="Resources"
+        tag="Application-controlled"
+        description="Read-only data sources exposed by the MCP server to the client. Resources let the AI read files\, database records\, or API responses without calling a function. The application decides which resources to expose and when."/>
+
+    <!-- 5. CONCEPT CARD: Prompts -->
+    <card-prompts
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="hvozdzeu/components/concept-card"
+        icon="&#x1F4AC;"
+        title="Prompts"
+        tag="User-controlled"
+        description="Pre-built reusable prompt templates that include context from resources and accept user-defined arguments. Prompts are surfaced in the UI as slash-commands. They standardize common patterns like code review\, summarization\, or translation."/>
+
+    <!-- 6. KEY POINTS
+         Multi-value String[] — commas inside values must be escaped as \,
+    -->
+    <principles
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="hvozdzeu/components/key-points"
+        title="Core MCP Principles"
+        items="[Universal interface: one protocol works with Claude\, GPT\, Gemini and local models,Separation of concerns: the AI model and the data layer evolve independently,Security by design: servers expose only what they explicitly declare,Stateful sessions: context is maintained across multiple tool calls,Transport-agnostic: works over stdio\, HTTP+SSE\, or WebSockets,Extensible: new primitives can be added without breaking existing clients]"/>
+
+    <!-- 7. CODE SNIPPET
+         Newlines inside XML attributes are normalised to spaces.
+         Use multiple separate properties or a single value without newlines.
+    -->
+    <jsonrpc
+        jcr:primaryType="nt:unstructured"
+        sling:resourceType="hvozdzeu/components/code-snippet"
+        label="JSON-RPC 2.0 · tools/call"
+        code='// → Client: list tools&#xa;{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}&#xa;&#xa;// ← Server: tool schema&#xa;{"jsonrpc":"2.0","id":1,"result":{"tools":[{"name":"get_current_time","description":"Returns current time in a given timezone","inputSchema":{"type":"object","properties":{"timezone":{"type":"string"}}}}]}}&#xa;&#xa;// → Client: call tool (LLM decided to invoke it)&#xa;{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"get_current_time","arguments":{"timezone":"Europe/Kyiv"}}}&#xa;&#xa;// ← Server: result&#xa;{"jsonrpc":"2.0","id":2,"result":{"content":[{"type":"text","text":"2026-05-11 11:30:00 EEST"}]}}'/>
+
+</jcr:root>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.hvozdzeu</groupId>
+        <artifactId>hvozdzeu</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <!-- packaging=content-package — Maven builds an AEM content package (zip).
+         The zip is installed via Package Manager (/crx/packmgr) or
+         automatically on deploy: mvn install -PautoInstallPackage -->
+    <artifactId>hvozdzeu.ui.apps</artifactId>
+    <packaging>content-package</packaging>
+    <name>hvozdzeu - UI Apps Package</name>
+    <description>AEM content package: /apps structure, components, OSGi configs</description>
+
+    <dependencies>
+        <!-- Dependency on the core bundle.
+             filevault-package-maven-plugin will automatically embed
+             hvozdzeu.core-*.jar in the package (under /apps/hvozdzeu/install/).
+             When the package is installed, AEM will install the bundle in Felix. -->
+        <dependency>
+            <groupId>com.hvozdzeu</groupId>
+            <artifactId>hvozdzeu.core</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!-- Root directory for package content — what gets zipped.
+             jcr_root/ maps to the JCR repository root (/). -->
+        <sourceDirectory>src/main/content</sourceDirectory>
+
+        <plugins>
+
+            <!-- FileVault Package Maven Plugin:
+                 Takes the contents of src/main/content/ and builds a zip package.
+
+                 Zip structure:
+                   jcr_root/          → JCR content (components, configs)
+                   META-INF/vault/    → package metadata (filter, properties)
+
+                 packageType=application — for /apps content only (no page content).
+                 Types: application, content, mixed, container. -->
+            <plugin>
+                <groupId>org.apache.jackrabbit</groupId>
+                <artifactId>filevault-package-maven-plugin</artifactId>
+                <configuration>
+                    <!-- mixed: package contains both /apps code and an OSGi bundle under /apps/hvozdzeu/install.
+                         The application type disallows embedded bundles (filevault validation).
+                         mixed is the standard approach for AEM 6.5 (non-cloud). -->
+                    <packageType>mixed</packageType>
+                    <filterSource>src/main/content/META-INF/vault/filter.xml</filterSource>
+                    <!-- Package group in Package Manager -->
+                    <group>com.hvozdzeu</group>
+                    <!-- Embed bundles from scope=compile dependencies -->
+                    <embeddeds>
+                        <embedded>
+                            <groupId>com.hvozdzeu</groupId>
+                            <artifactId>hvozdzeu.core</artifactId>
+                            <!-- OSGi bundle install path in JCR.
+                                 AEM automatically installs jar files placed in this folder. -->
+                            <target>/apps/hvozdzeu/install</target>
+                        </embedded>
+                    </embeddeds>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <!-- =========================================================
+         DEPLOYMENT PROFILES
+         mvn install -PautoInstallPackage  → deploy to local AEM instance
+         ========================================================= -->
+    <profiles>
+        <profile>
+            <id>autoInstallPackage</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Adobe Content Package Maven Plugin for deploying the package to AEM -->
+                    <plugin>
+                        <groupId>com.day.jcr.vault</groupId>
+                        <artifactId>content-package-maven-plugin</artifactId>
+                        <version>1.0.4</version>
+                        <executions>
+                            <execution>
+                                <id>install-package</id>
+                                <goals>
+                                    <goal>install</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- AEM instance URL for deployment -->
+                                    <serviceURL>http://localhost:4502/crx/packmgr/service.jsp</serviceURL>
+                                    <userId>admin</userId>
+                                    <password>admin</password>
+                                    <force>true</force>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

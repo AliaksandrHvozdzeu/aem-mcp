@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    cq:Template — page template. Authors select it when creating a new page
+    via the Sites Admin console. Key properties:
+      jcr:title          — template name shown in the create-page dialog
+      sling:resourceType — component that will render pages using this template
+      ranking            — order in the template list (lower number = higher up)
+      allowedPaths       — paths where pages based on this template can be created
+-->
+<jcr:root
+    xmlns:jcr="http://www.jcp.org/jcr/1.0"
+    xmlns:cq="http://www.day.com/jcr/cq/1.0"
+    xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="cq:Template"
+    jcr:title="MCP Page"
+    jcr:description="Simple page template for MCP demo content"
+    sling:resourceType="hvozdzeu/components/page"
+    ranking="{Long}1"
+    allowedPaths="[/content/hvozdzeu(/.*)?]">
+
+    <!--
+        jcr:content inside the template is the structure that AEM copies
+        into each new page created from this template.
+    -->
+    <jcr:content
+        jcr:primaryType="cq:PageContent"
+        jcr:title="New Page"
+        sling:resourceType="hvozdzeu/components/page"/>
+
+</jcr:root>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    config.xml — FileVault settings for this package.
+
+    useBinaryReferences — when true, binary data is not embedded in the package
+    (only useful for large content packages that contain media files).
+
+    For most projects this file can be left as-is.
+-->
+<vaultfs version="1.1">
+    <properties/>
+    <handlers>
+        <handler class="org.apache.jackrabbit.vault.packaging.impl.ZipHandler"/>
+    </handlers>
+</vaultfs>

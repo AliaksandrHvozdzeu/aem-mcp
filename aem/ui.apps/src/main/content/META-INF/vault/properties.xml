@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<!--
+    properties.xml — package metadata displayed in the AEM Package Manager.
+
+    group        — group in CRX Package Manager (for organising packages)
+    name         — package name
+    version      — version (must match the version in pom.xml)
+    description  — description visible in Package Manager
+    requiresRoot — true if installation requires root privileges
+    acHandling   — how to handle Access Control Lists:
+                   ignore     : ignore ACLs in the package
+                   overwrite  : overwrite ACLs (use with caution in production!)
+                   merge      : merge ACLs
+-->
+<properties>
+    <entry key="group">com.hvozdzeu</entry>
+    <entry key="name">hvozdzeu.ui.apps</entry>
+    <entry key="version">1.0.0-SNAPSHOT</entry>
+    <entry key="description">hvozdzeu UI Apps: components and OSGi configs</entry>
+    <entry key="requiresRoot">false</entry>
+    <entry key="acHandling">ignore</entry>
+    <entry key="packageType">mixed</entry>
+</properties>

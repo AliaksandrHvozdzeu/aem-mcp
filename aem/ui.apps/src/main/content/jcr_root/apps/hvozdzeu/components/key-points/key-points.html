@@ -1,0 +1,32 @@
+<!--
+    Key Points — список пунктов с галочками.
+
+    Использует KeyPointsModel, который:
+      1. читает multi-value String[] из JCR-свойства "items"
+      2. возвращает Java List<String> для итерации в HTL
+
+    data-sly-list.point — итерирует List<String>, переменная point = текущий элемент.
+    В HTL можно итерировать: Collection, Iterable, Iterator, array, Map.
+-->
+<sly data-sly-use.model="com.hvozdzeu.core.models.KeyPointsModel"
+     data-sly-test="${model.hasPoints}">
+
+    <section class="cmp-key-points">
+
+        <sly data-sly-test="${model.title}">
+            <h2 class="cmp-key-points__title">${model.title}</h2>
+        </sly>
+
+        <!--
+            data-sly-element — динамически выбирает HTML-тег.
+            model.ordered=true → <ol>, false → <ul>
+        -->
+        <ul class="cmp-key-points__list"
+            data-sly-element="${model.ordered ? 'ol' : 'ul'}">
+            <li class="cmp-key-points__item"
+                data-sly-list.point="${model.pointsList}">${point}</li>
+        </ul>
+
+    </section>
+
+</sly>

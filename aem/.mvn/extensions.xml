@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    .mvn/extensions.xml is loaded by Maven BEFORE scanning POM files.
+
+    This solves the packaging=bundle problem in multi-module projects:
+    without this file Maven does not know how to read <packaging>bundle</packaging>
+    during the initial reactor scan, which breaks dependencyManagement
+    inheritance from the parent POM.
+
+    maven-bundle-plugin is declared here as a build extension, which
+    registers the "bundle" packaging type in the Maven lifecycle.
+-->
+<extensions xmlns="http://maven.apache.org/EXTENSIONS/1.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/EXTENSIONS/1.0.0
+            https://maven.apache.org/xsd/core-extensions-1.0.0.xsd">
+
+    <extension>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>5.1.9</version>
+    </extension>
+
+</extensions>

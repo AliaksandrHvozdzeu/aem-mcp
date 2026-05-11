@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    filter.xml defines which JCR paths are included in the package.
+
+    When the package is installed in AEM:
+      1. Removes the content at the listed paths (when mode="replace")
+      2. Imports the new content from the package
+
+    root  — the JCR root path managed by this package
+    mode  — "replace" (default): replace existing content; "merge": merge
+
+    Add a new <filter root="..."/> for each new area you want to manage,
+    e.g. /conf/hvozdzeu for editable templates or
+         /content/hvozdzeu for authored page content.
+-->
+<workspaceFilter version="1.0">
+
+    <!-- Components, templates, configs, and the OSGi install folder -->
+    <filter root="/apps/hvozdzeu"/>
+
+    <!-- Test page content (MCP Principles) -->
+    <filter root="/content/hvozdzeu"/>
+
+</workspaceFilter>

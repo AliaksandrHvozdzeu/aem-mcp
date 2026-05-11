@@ -1,0 +1,24 @@
+<!--
+    Concept Card — карточка для описания концепции/понятия.
+    JCR-свойства: icon (emoji), title, description, tag.
+    Читаем через `properties` без Sling Model.
+-->
+<sly data-sly-test="${properties.title}">
+    <article class="cmp-concept-card">
+
+        <sly data-sly-test="${properties.icon}">
+            <div class="cmp-concept-card__icon" aria-hidden="true">${properties.icon}</div>
+        </sly>
+
+        <div class="cmp-concept-card__content">
+            <h3 class="cmp-concept-card__title">${properties.title}</h3>
+            <sly data-sly-test="${properties.description}">
+                <p class="cmp-concept-card__description">${properties.description}</p>
+            </sly>
+            <sly data-sly-test="${properties.tag}">
+                <span class="cmp-concept-card__tag">${properties.tag}</span>
+            </sly>
+        </div>
+
+    </article>
+</sly>

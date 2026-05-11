@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    JCR node /apps/hvozdzeu.
+    sling:Folder — standard node type for folders under /apps.
+    jcr:title — displayed in CRX/DE as the folder label.
+-->
+<jcr:root
+    xmlns:jcr="http://www.jcp.org/jcr/1.0"
+    xmlns:sling="http://sling.apache.org/jcr/sling/1.0"
+    jcr:primaryType="sling:Folder"
+    jcr:title="hvozdzeu"/>
